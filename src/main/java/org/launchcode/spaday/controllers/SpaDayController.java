@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 
 @Controller
+@RequestMapping("")
 public class SpaDayController {
 
     public boolean checkSkinType(String skinType, String facialType) {
@@ -43,31 +44,17 @@ public class SpaDayController {
         }
     }
 
-    @GetMapping(value="")
-    @ResponseBody
+    @RequestMapping(value="")
     public String customerForm () {
-        String html = "<form method = 'post'>" +
-                "Name: <br>" +
-                "<input type = 'text' name = 'name'>" +
-                "<br>Skin type: <br>" +
-                "<select name = 'skintype'>" +
-                "<option value = 'oily'>Oily</option>" +
-                "<option value = 'combination'>Combination</option>" +
-                "<option value = 'normal'>Normal</option>" +
-                "<option value = 'dry'>Dry</option>" +
-                "</select><br>" +
-                "Manicure or Pedicure? <br>" +
-                "<select name = 'manipedi'>" +
-                "<option value = 'manicure'>Manicure</option>" +
-                "<option value = 'pedicure'>Pedicure</option>" +
-                "</select><br>" +
-                "<input type = 'submit' value = 'Submit'>" +
-                "</form>";
-        return html;
+        return "customer-form";
     }
 
-    @PostMapping(value="")
-    public String spaMenu(@RequestParam String name, @RequestParam String skintype, @RequestParam String manipedi, Model model) {
+    @RequestMapping(value="menu")
+    public String spaMenu(@RequestParam String name,
+                          @RequestParam String skintype,
+                          @RequestParam(required = false) String mani,
+                          @RequestParam(required = false) String pedi,
+                          Model model) {
 
         ArrayList<String> facials = new ArrayList<String>();
         facials.add("Microdermabrasion");
@@ -77,10 +64,15 @@ public class SpaDayController {
 
         ArrayList<String> appropriateFacials = new ArrayList<String>();
         for (int i = 0; i < facials.size(); i ++) {
-            if (checkSkinType(skintype,facials.get(i))) {
-                appropriateFacials.add(facials.get(i));
+                if (checkSkinType(skintype,facials.get(i))) {
+                    appropriateFacials.add(facials.get(i));
+                }
             }
-        }
+        model.addAttribute("name", name);
+        model.addAttribute("skintype", skintype);
+        model.addAttribute("mani", mani);
+        model.addAttribute("pedi", pedi);
+        model.addAttribute("appropriateFacials", appropriateFacials);
 
         return "menu";
     }
